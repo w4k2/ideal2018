@@ -1,16 +1,29 @@
-import numpy as np
+"""
+IDEAL2018 experiments.
 
-def hamming(a,b):
-    return np.sum(a ^ b) / a.shape[0]
+Multi-class imbalanced data classification based on feature selection
+techniques.
+"""
+# import numpy as np
+import method as m
+import helper as h
+from sklearn import svm
 
-a = np.array([0,1,1,0,1])
-b = np.array([1,1,1,0,1])
+datasets = h.datasets_for_groups([
+    "imb_IRhigherThan9p1",
+    "imb_IRhigherThan9p2"
+])
 
-c = a ^ b
-d = np.sum(a^b)
+for dataset in datasets:
+    print(dataset)
+    # Load dataset
+    X, y, X_, y_ = h.load_dataset(dataset)
+    print(X.shape)
 
-print(a,b,c,d)
+    fse = m.FeatureSelectingEnsemble()
+    fse.fit(X, y)
 
-h = hamming(a, b)
+    print(fse.quality())
+    exit()
 
-print(h)
+base_clf = svm.SVC()
