@@ -13,34 +13,13 @@ np.random.seed(2)
 
 base_clf = naive_bayes.GaussianNB
 
-datasets = h.datasets_for_groups([
-    "bal",
-    "imb_IRlowerThan9",
-    "imb_IRhigherThan9p1",
-    "imb_IRhigherThan9p2"
-])
 
-print('group,dataset,features,bare,one_random_ens,gfse,best_one')
-
-min_features = 8
-analyzed_datasets = 0
-for dataset in datasets:
-    # Load dataset
-    X, y, X_, y_ = h.load_dataset(dataset)
-
-    no_classes = len(np.unique(y))
-    if no_classes != 2:
-        # print("Multiclass -- passing")
-        continue
-
-    if X.shape[1] < min_features:
-        # print("To few features -- passing")
-        continue
-
-    label_corrector = np.max(y) - 1
-
+def process_instance(dataset, label_corrector, X_, y_, base_clf,
+                     alpha=.5, beta=.5,
+                     n_candidates=20, n_members=5,
+                     p=.5):
+    """Process single instance of problem."""
     bas_bacs = []
-    rfe_bacs = []
     gfs_bacs = []
     bns_bacs = []
     for f in range(5):
@@ -58,13 +37,8 @@ for dataset in datasets:
         bare_bac = metrics.balanced_accuracy_score(y_f_test,
                                                    bare_prediction)
 
-        # One rfe
-        rfe = m.RandomFeatureEnsemble(base_clf=base_clf)
-        rfe.fit(X_f_train, y_f_train)
-        q, bac = rfe.quality(X_f_test, y_f_test)
-
         # GFSE
-        gfse = m.GeneticFeatureSelectionEnsemble(base_clf, a=.1, b=.1)
+        gfse = m.FeatureSelectionEnsemble(base_clf, alpha=.1, beta=.1)
         gfse.fit(X_f_train, y_f_train)
         gbac = gfse.bac(X_f_test, y_f_test)
         # print(gbac)
@@ -83,19 +57,35 @@ for dataset in datasets:
             bens.append(a)
 
         bas_bacs.append(bare_bac)
-        rfe_bacs.append(bac)
         gfs_bacs.append(gbac)
         bns_bacs.append(np.mean(bens))
 
     bas_bac = np.mean(bas_bacs)
-    rfe_bac = np.mean(rfe_bacs)
     gfs_bac = np.mean(gfs_bacs)
     bns_bac = np.mean(bns_bacs)
 
-    print("%s,%s,%i,%.3f,%.3f,%.3f,%.3f" % (
-        dataset[0], dataset[1], X.shape[1], bas_bac, rfe_bac, gfs_bac,
-        bns_bac
-    ))
-    analyzed_datasets += 1
+    return (bas_bac, gfs_bac, bns_bac)
 
-# print("%i analyzed datasets" % analyzed_datasets)
+
+print('group,dataset,features,bare,one_random_ens,gfse,best_one')
+
+min_features = 8
+analyzed_datasets = 0
+for dataset in h.datasets():
+    # Load dataset
+    X, y, X_, y_ = h.load_dataset(dataset)
+
+    # Analyze dataset
+    no_classes = len(np.unique(y))
+
+    # Process instances of problem
+    label_corrector = np.max(y) - 1
+    res = process_instance(
+        dataset, label_corrector=label_corrector,
+        X_=X_, y_=y_, base_clf=base_clf,
+        alpha=.5, beta=.5, p=.5,
+        n_candidates=20, n_members=5
+    )
+    print(np.array(res))
+
+    analyzed_datasets += 1

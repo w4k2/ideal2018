@@ -30,41 +30,38 @@ def load_keel(string, separator=","):
 
 def load_dataset(dataset):
     """Load given dataset."""
-    group_path, ds_name = dataset
     # Load full dataset
     X, y = load_keel("%s/%s/%s.dat" % (
-        group_path, ds_name, ds_name
+        ds_dir, dataset, dataset
     ))
     X_, y_ = [], []
     # Load and process folds
     for i in range(1, 6):
         try:
             X_train, y_train = load_keel("%s/%s/%s-5-fold/%s-5-%itra.dat" % (
-                group_path, ds_name, ds_name, ds_name, i
+                ds_dir, dataset, dataset, dataset, i
             ))
             X_test, y_test = load_keel("%s/%s/%s-5-fold/%s-5-%itst.dat" % (
-                group_path, ds_name, ds_name, ds_name, i
+                ds_dir, dataset, dataset, dataset, i
             ))
         except FileNotFoundError:
             X_train, y_train = load_keel("%s/%s/%s-5-%itra.dat" % (
-                group_path, ds_name, ds_name, i
+                ds_dir, dataset, dataset, i
             ))
             X_test, y_test = load_keel("%s/%s/%s-5-%itst.dat" % (
-                group_path, ds_name, ds_name, i
+                ds_dir, dataset, dataset, i
             ))
         X_.append((X_train, X_test))
         y_.append((y_train, y_test))
     return (X, y, X_, y_)
 
 
-def datasets_for_groups(ds_groups):
-    """Return datasets for a tuple of groups."""
+def datasets():
+    """Return datasets list."""
     datasets = []
-    for group_idx, ds_group in enumerate(ds_groups):
-        group_path = "%s/%s" % (ds_dir, ds_group)
-        ds_list = sorted(os.listdir(group_path))
-        for ds_idx, ds_name in enumerate(ds_list):
-            if ds_name[0] == '.' or ds_name[0] == '_':
-                continue
-            datasets.append((group_path, ds_name))
+    ds_list = sorted(os.listdir('datasets'))
+    for ds_idx, ds_name in enumerate(ds_list):
+        if ds_name[0] == '.' or ds_name[0] == '_':
+            continue
+        datasets.append(ds_name)
     return datasets

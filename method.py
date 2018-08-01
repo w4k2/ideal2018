@@ -8,26 +8,31 @@ import helper as h
 from sklearn import metrics
 
 
-class GeneticFeatureSelectionEnsemble():
+class FeatureSelectionEnsemble():
     """
-    GFSE.
+    FSE.
 
     Lorem ipsum dolor sit amet.
     """
 
-    def __init__(self, base_clf, n_candidates=20, a=.5, b=.5):
+    def __init__(self, base_clf, n_candidates=20, n_members=5,
+                 alpha=.5, beta=.5, p=.5):
         """Init."""
         self.base_clf = base_clf
         self.n_candidates = n_candidates
-        self.a = a
-        self.b = b
+        self.n_members = n_members
+        self.alpha = alpha
+        self.beta = beta
+        self.p = p
 
     def fit(self, X, y):
         """Compute models."""
         self.candidates = []
         for i in range(self.n_candidates):
-            candidate = RandomFeatureEnsemble(self.base_clf, alpha=self.a,
-                                              beta=self.b)
+            candidate = RandomFeatureEnsemble(self.base_clf, p=self.p,
+                                              alpha=self.alpha,
+                                              beta=self.beta,
+                                              n_members=self.n_members)
             candidate.fit(X, y)
             self.candidates.append(candidate)
 
