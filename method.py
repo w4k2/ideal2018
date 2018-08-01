@@ -5,7 +5,8 @@ Hamming and others.
 """
 import numpy as np
 import helper as h
-from sklearn import metrics
+from sklearn import preprocessing
+from sklearn.metrics import balanced_accuracy_score as bas
 
 
 class FeatureSelectionEnsemble():
@@ -36,24 +37,20 @@ class FeatureSelectionEnsemble():
             candidate.fit(X, y)
             self.candidates.append(candidate)
 
-        scores = np.array([c.quality(X, y) for c in self.candidates])
+    def bac(self, X, y, weighting):
+        """Balanced accuracy score."""
+        scores = np.array([c.quality(X, y, weighting)
+                           for c in self.candidates])
         self.qualities = scores[:, 0]
         self.bacs = scores[:, 1]
 
         places = np.argsort(1-self.qualities)
 
-        # print(places)
-        # print(self.qualities)
-
         self.qualities = self.qualities[places]
         self.bacs = self.bacs[places]
         self.candidates = [self.candidates[i] for i in places]
 
-        # print(self.qualities)
-
-    def bac(self, X, y):
-        """Balanced accuracy score."""
-        return self.candidates[0].bac(X, y)
+        return self.candidates[0].bac(X, y, weighting)
 
 
 class RandomFeatureEnsemble():
@@ -82,14 +79,14 @@ class RandomFeatureEnsemble():
         self.X = X
         self.y = y
         self.d = X.shape[1]
-        if not hasattr(self, 'selected_features'):
-            # Random features if none established
-            self.selected_features = np.zeros((self.n_members,
-                                               self.d)).astype(bool)
-            self.selected_features = np.random.choice(a=[False, True],
-                                                      size=(self.n_members,
-                                                            self.d),
-                                                      p=[1-self.p, self.p])
+
+        # Random features if none established
+        self.selected_features = np.zeros((self.n_members,
+                                           self.d)).astype(bool)
+        self.selected_features = np.random.choice(a=[False, True],
+                                                  size=(self.n_members,
+                                                        self.d),
+                                                  p=[1-self.p, self.p])
 
         # Prevent for empty features set
         for row in self.selected_features:
@@ -98,13 +95,20 @@ class RandomFeatureEnsemble():
 
         # Establishing ensemble
         self.ensemble = []
+        self.weights = []
         for features_mask in self.selected_features:
             X_ = self.X[:, features_mask]
             clf = self.base_clf()
             clf.fit(X_, y)
             self.ensemble.append(clf)
+            self.weights.append(bas(y, clf.predict(X[:, features_mask])))
+        self.weights = np.array(self.weights)
 
-    def bac(self, X, y):
+        scaler = preprocessing.MinMaxScaler()
+        self.nweights = scaler.fit_transform(self.weights.reshape(-1, 1)).T[0]
+        self.nweights += .01
+
+    def bac(self, X, y, weighting):
         """Balanced accuracy score."""
         # Calculate ensemble support matrix
         esm = []
@@ -114,17 +118,22 @@ class RandomFeatureEnsemble():
         esm = np.array(esm)
 
         # Calculate support as mean for member classifiers
+        if weighting == 1:
+            esm *= self.weights[:, np.newaxis, np.newaxis]
+        elif weighting == 2:
+            esm *= self.nweights[:, np.newaxis, np.newaxis]
+
         mesm = np.mean(esm, axis=0)
 
         # Prediction and score
         prediction = np.argmax(mesm, axis=1)
-        score = metrics.balanced_accuracy_score(y, prediction)
+        score = bas(y, prediction)
 
         return score
 
-    def quality(self, X, y):
+    def quality(self, X, y, weighting):
         """Optimization criteria."""
-        bac = self.bac(X, y)
+        bac = self.bac(X, y, weighting)
         a = self.alpha * self.features_proportion()
         b = self.beta * self.average_hamming()
         return bac - a + b, bac
