@@ -17,13 +17,11 @@ class FeatureSelectionEnsemble():
     """
 
     def __init__(self, base_clf, n_candidates=20, n_members=5,
-                 alpha=.5, beta=.5, p=.5):
+                 p=.5):
         """Init."""
         self.base_clf = base_clf
         self.n_candidates = n_candidates
         self.n_members = n_members
-        self.alpha = alpha
-        self.beta = beta
         self.p = p
 
     def fit(self, X, y):
@@ -31,15 +29,13 @@ class FeatureSelectionEnsemble():
         self.candidates = []
         for i in range(self.n_candidates):
             candidate = RandomFeatureEnsemble(self.base_clf, p=self.p,
-                                              alpha=self.alpha,
-                                              beta=self.beta,
                                               n_members=self.n_members)
             candidate.fit(X, y)
             self.candidates.append(candidate)
 
-    def bac(self, X, y, weighting):
+    def bac(self, X, y, alpha, beta, weighting):
         """Balanced accuracy score."""
-        scores = np.array([c.quality(X, y, weighting)
+        scores = np.array([c.quality(X, y, alpha, beta, weighting)
                            for c in self.candidates])
         self.qualities = scores[:, 0]
         self.bacs = scores[:, 1]
@@ -50,7 +46,7 @@ class FeatureSelectionEnsemble():
         self.bacs = self.bacs[places]
         self.candidates = [self.candidates[i] for i in places]
 
-        return self.candidates[0].bac(X, y, weighting)
+        return self.candidates[0].bac(X, y, alpha, beta, weighting)
 
 
 class RandomFeatureEnsemble():
@@ -60,15 +56,13 @@ class RandomFeatureEnsemble():
     Base structure for genetic algorithm.
     """
 
-    def __init__(self, base_clf, alpha=.5, beta=.5, n_members=5,
+    def __init__(self, base_clf, n_members=5,
                  p=.5, parents=None):
         """
         Initializer.
 
         p - probability of using a feature
         """
-        self.alpha = alpha
-        self.beta = beta
         self.n_members = n_members
         self.p = p
         self.parents = parents
@@ -108,7 +102,7 @@ class RandomFeatureEnsemble():
         self.nweights = scaler.fit_transform(self.weights.reshape(-1, 1)).T[0]
         self.nweights += .01
 
-    def bac(self, X, y, weighting):
+    def bac(self, X, y, alpha, beta, weighting):
         """Balanced accuracy score."""
         # Calculate ensemble support matrix
         esm = []
@@ -131,11 +125,11 @@ class RandomFeatureEnsemble():
 
         return score
 
-    def quality(self, X, y, weighting):
+    def quality(self, X, y, alpha, beta, weighting):
         """Optimization criteria."""
-        bac = self.bac(X, y, weighting)
-        a = self.alpha * self.features_proportion()
-        b = self.beta * self.average_hamming()
+        bac = self.bac(X, y, alpha, beta, weighting)
+        a = alpha * self.features_proportion()
+        b = beta * self.average_hamming()
         return bac - a + b, bac
 
     def average_hamming(self):

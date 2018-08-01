@@ -1,7 +1,52 @@
 """Universal helper for W4K2."""
 import numpy as np
 import os
+import itertools
+import matplotlib.pyplot as plt
 ds_dir = "datasets"
+variations = ("bare", "e_r", "e_w", "e_n", "s_r", "s_w", "s_n")
+
+
+def plot(dataset, alphas, betas, sumtable_scores, sumtable_winners, bs):
+    """Plot whole search result."""
+    cmap = plt.cm.Blues
+    cmap = plt.cm.coolwarm
+    maxs = np.max(sumtable_scores)
+    diff = np.abs(maxs - bs)
+
+    plt.imshow(sumtable_scores, interpolation='nearest',
+               cmap=cmap, vmin=bs - diff, vmax=bs + diff)
+    plt.title("%s (bare %.3f)" % (dataset, bs))
+    plt.colorbar()
+
+    plt.yticks(np.arange(len(alphas)),
+               alphas, rotation=45)
+    plt.xticks(np.arange(len(betas)),
+               betas, rotation=45)
+
+    tresh = .5
+    if sumtable_winners is not None:
+        for i, j in itertools.product(range(len(alphas)),
+                                      range(len(betas))):
+            plt.text(j, i, "%s\n%.3f" % (variations[sumtable_winners[i, j]],
+                                         sumtable_scores[i, j]),
+                     horizontalalignment="center",
+                     verticalalignment="center",
+                     color="white" if sumtable_scores[i, j] > tresh else "black")
+    else:
+        for i, j in itertools.product(range(len(alphas)),
+                                      range(len(betas))):
+            plt.text(j, i, "%.3f" % (sumtable_scores[i, j]),
+                     horizontalalignment="center",
+                     verticalalignment="center",
+                     color="white" if sumtable_scores[i, j] > tresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('alpha')
+    plt.xlabel('beta')
+
+    plt.savefig("plots/%s.png" % dataset)
+    plt.clf()
 
 
 def hamming(a, b):
