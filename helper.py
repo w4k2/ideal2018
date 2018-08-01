@@ -4,7 +4,7 @@ import os
 import itertools
 import matplotlib.pyplot as plt
 ds_dir = "datasets"
-variations = ("bare", "e_r", "e_w", "e_n", "s_r", "s_w", "s_n")
+variations = ("e_r", "e_w", "e_n", "s_r", "s_w", "s_n")
 
 
 def plot(dataset, alphas, betas, sumtable_scores, sumtable_winners, bs):

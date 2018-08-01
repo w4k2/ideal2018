@@ -129,9 +129,9 @@ for dataset in h.datasets():
         row_scores = []
         row_winners = []
         for b, beta in enumerate(betas):
-            local_res = res[a, b, :, :]
+            local_res = res[a, b, 1:, :]
             mean_scores = np.mean(local_res, axis=1)
-            bare_score = mean_scores[0]
+            bare_score = np.mean(res[a, b, 0, :])
             winner = np.argmax(mean_scores)
             score = np.max(mean_scores)
 
@@ -142,7 +142,7 @@ for dataset in h.datasets():
            bare_score)
 
     for i, var in enumerate(h.variations):
-        loc_sco = np.mean(res[:, :, i, :], axis=2)
+        loc_sco = np.mean(res[:, :, i+1, :], axis=2)
         h.plot("%s_%s" % (dataset, var), alphas, betas,
                loc_sco, None, bare_score)
 
