@@ -74,8 +74,8 @@ for dataset in datasets:
     rfe_bac = np.mean(rfe_bacs)
     gfs_bac = np.mean(gfs_bacs)
 
-    print("%s,%i,%.3f,%.3f,%.3f" % (
-        dataset[1], X.shape[1], bas_bac, rfe_bac, gfs_bac
+    print("%s,%s,%i,%.3f,%.3f,%.3f" % (
+        dataset[0], dataset[1], X.shape[1], bas_bac, rfe_bac, gfs_bac
     ))
     analyzed_datasets += 1
     # break
