@@ -1,0 +1,34 @@
+Wine data set
+
+1: Description.
+
+These data are the results of a chemical analysis of wines grown in the same region in Italy but derived from three different cultivars. The analysis determined the quantities of 13 constituents found in each of the three types of wines.
+
+In a classification context, this is a well posed problem with well behaved class structures. A good data set for first testing of a new classifier, but not very challenging.
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		178
+5: Features.		13
+6: Classes.			3	
+7: Missing values.	No
+
+8: Header.
+
+@relation wine
+@attribute Alcohol real [11.0, 14.9]
+@attribute Malic_acid real [0.7, 5.8]
+@attribute Ash real [1.3, 3.3]
+@attribute Alcalinity_Of_Ash real [10.6, 30.0]
+@attribute Magnesium real [70.0, 162.0]
+@attribute Total_Phenols real [0.9, 3.9]
+@attribute Flavanoids real [0.3, 5.1]
+@attribute Nonflavanoids_phenols real [0.1, 0.7]
+@attribute Proanthocyanins real [0.4, 3.6]
+@attribute Color_Intensity real [1.2, 13.0]
+@attribute Hue real [0.4, 1.8]
+@attribute OD280/OD315 real [1.2, 4.0]
+@attribute Proline real [278.0, 1680.0]
+@attribute Class {1,2,3}
+@inputs Alcohol, Malic_acid, Ash, Alcalinity_Of_Ash, Magnesium, Total_Phenols, Flavanoids, Nonflavanoids_phenols, Proanthocyanins, Color_Intensity, Hue, OD280/OD315, Proline
+@outputs Class

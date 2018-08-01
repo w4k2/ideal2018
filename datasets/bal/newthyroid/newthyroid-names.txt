@@ -1,0 +1,24 @@
+Thyroid Disease (New Thyroid) data set
+
+1: Description.
+
+This data set is one of the several databases about Thyroid avalaible at the UCI repository. The task is to detect is a given patient is normal (1) or suffers from hyperthyroidism (2) or hypothyroidism (3)
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		215
+5: Features.		5
+6: Classes.			3	
+7: Missing values.	No
+
+8: Header.
+
+@relation newthyroid
+@attribute T3resin integer [65, 144]
+@attribute Thyroxin real [0.5, 25.3]
+@attribute Triiodothyronine real [0.2, 10.0]
+@attribute Thyroidstimulating real [0.1, 56.4]
+@attribute TSH_value real [-0.7, 56.3]
+@attribute Class {3, 2, 1}
+@inputs T3resin, Thyroxin, Triiodothyronine, Thyroidstimulating, TSH_value
+@outputs Class

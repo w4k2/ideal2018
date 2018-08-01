@@ -1,0 +1,23 @@
+Balance Scale data set
+
+1: Description.
+
+This data set was generated to model psychological experimental results. Each example is classified as having the balance scale tip to the right, tip to the left, or be balanced. The attributes are the left weight, the left distance, the right weight, and the right distance. The correct way to find the class is the greater of (left-distance * left-weight) and (right-distance * right-weight). If they are equal, it is balanced.
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		625
+5: Features.		4
+6: Classes.			3	
+7: Missing values.	No
+
+8: Header.
+
+@relation balance
+@attribute Left-weight real [1.0, 5.0]
+@attribute Left-distance real [1.0, 5.0]
+@attribute Right-weight real [1.0, 5.0]
+@attribute Right-distance real [1.0, 5.0]
+@attribute Balance_scale {L,B,R}
+@inputs Left-weight, Left-distance, Right-weight, Right-distance
+@outputs Balance_scale

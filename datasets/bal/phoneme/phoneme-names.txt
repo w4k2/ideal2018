@@ -1,0 +1,26 @@
+Phoneme data set
+
+1: Description.
+
+The aim of this dataset is to distinguish between nasal (class 0) and oral sounds (class 1). The class distribution is 3,818 samples in class 0 and 1,586 samples in class 1. 
+
+The phonemes are transcribed as follows: sh as in she, dcl as in dark, iy as the vowel in she, aa as the vowel in dark, and ao as the first vowel in water.  
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		5404
+5: Features.		5
+6: Classes.			2	
+7: Missing values.	No
+
+8: Header.
+
+@relation phoneme
+@attribute Aa real [-1.7, 4.107]
+@attribute Ao real [-1.327, 4.378]
+@attribute Dcl real [-1.823, 3.199]
+@attribute Iy real [-1.581, 2.826]
+@attribute Sh real [-1.284, 2.719]
+@attribute Class {0, 1}
+@inputs Aa, Ao, Dcl, Iy, Sh
+@outputs Class

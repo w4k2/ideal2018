@@ -1,0 +1,28 @@
+Ecoli data set
+
+1: Description.
+
+The objective of this problem is to predict the localization site of proteins by employing some measures about the cell (cytoplasm, inner membrane, perisplasm, outer membrane, outer membrane lipoprotein, inner membrane lipoprotein inner membrane, cleavable signal sequence).
+
+To asses the data to classification process, the first attribute of the original data set (the sequence name) has been removed in this version
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		336
+5: Features.		7
+6: Classes.			8	
+7: Missing values.	No
+
+8: Header.
+
+@relation ecoli
+@attribute Mcg real[0.0,89.0]
+@attribute Gvh real[1.0,88.0]
+@attribute Lip real[1.0,48.0]
+@attribute Chg real[1.0,5.0]
+@attribute Aac real[0.0,88.0]
+@attribute Alm1 real[1.0,94.0]
+@attribute Alm2 real[0.0,99.0]
+@attribute Site {cp,im,imS,imL,imU,om,omL,pp}
+@inputs Mcg, Gvh, Lip, Chg, Aac, Alm1, Alm2
+@output Site

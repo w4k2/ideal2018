@@ -11,12 +11,9 @@ def hamming(a, b):
 
 def load_keel(string, separator=","):
     """Load arff file from keel dataset."""
-    try:
-        f = open(string, "r")
-        s = [line for line in f]
-        f.close()
-    except:
-        raise Exception
+    f = open(string, "r")
+    s = [line for line in f]
+    f.close()
 
     s = filter(lambda e: e[0] != '@', s)
     s = [v.strip().split(separator) for v in s]
@@ -25,6 +22,8 @@ def load_keel(string, separator=","):
     d = {'positive': 1, 'negative': 0}
     y = np.asarray([d[v[-1].strip()] if v[-1].strip() in d
                     else v[-1].strip() for v in s])
+
+    y = y.astype(int)
 
     return X, y
 
@@ -39,12 +38,20 @@ def load_dataset(dataset):
     X_, y_ = [], []
     # Load and process folds
     for i in range(1, 6):
-        X_train, y_train = load_keel("%s/%s/%s-5-fold/%s-5-%itra.dat" % (
-            group_path, ds_name, ds_name, ds_name, i
-        ))
-        X_test, y_test = load_keel("%s/%s/%s-5-fold/%s-5-%itst.dat" % (
-            group_path, ds_name, ds_name, ds_name, i
-        ))
+        try:
+            X_train, y_train = load_keel("%s/%s/%s-5-fold/%s-5-%itra.dat" % (
+                group_path, ds_name, ds_name, ds_name, i
+            ))
+            X_test, y_test = load_keel("%s/%s/%s-5-fold/%s-5-%itst.dat" % (
+                group_path, ds_name, ds_name, ds_name, i
+            ))
+        except FileNotFoundError:
+            X_train, y_train = load_keel("%s/%s/%s-5-%itra.dat" % (
+                group_path, ds_name, ds_name, i
+            ))
+            X_test, y_test = load_keel("%s/%s/%s-5-%itst.dat" % (
+                group_path, ds_name, ds_name, i
+            ))
         X_.append((X_train, X_test))
         y_.append((y_train, y_test))
     return (X, y, X_, y_)

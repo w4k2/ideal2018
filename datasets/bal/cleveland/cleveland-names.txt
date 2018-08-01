@@ -1,0 +1,32 @@
+Heart Disease (Cleveland) data set
+
+1: Description.
+
+This data set is a part of the Heart Disease Data Set (the part obtained from the V.A. Medical Center, Long Beach and Cleveland Clinic Foundation), using a subset of 14 attributes. The task is to detect the presence of heart disease in the patient. It is integer valued from 0 (no presence) to 4. 
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		297 (303)
+5: Features.		13
+6: Classes.			5	
+7: Missing values.	No
+
+8: Header.
+
+@relation cleveland
+@attribute Age real [29.0, 77.0]
+@attribute Sex real [0.0, 1.0]
+@attribute Cp real [1.0, 4.0]
+@attribute Trestbps real [94.0, 200.0]
+@attribute Chol real [126.0, 564.0]
+@attribute Fbs real [0.0, 1.0]
+@attribute Restecg real [0.0, 2.0]
+@attribute Thalach real [71.0, 202.0]
+@attribute Exang real [0.0, 1.0]
+@attribute Oldpeak real [0.0, 6.2]
+@attribute Slope real [1.0, 3.0]
+@attribute Ca real [0.0, 3.0]
+@attribute Thal real [3.0, 7.0]
+@attribute Num {0,1,2,3,4}
+@inputs Age, Sex, Cp, Trestbps, Chol, Fbs, Restecg, Thalach, Exang, Oldpeak, Slope, Ca, Thal
+@outputs Num

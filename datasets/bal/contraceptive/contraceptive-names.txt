@@ -1,0 +1,28 @@
+Contraceptive Method Choice data set
+
+1: Description.
+
+This dataset is a subset of the 1987 National Indonesia Contraceptive Prevalence Survey. The samples are married women who were either not pregnant or do not know if they were at the time of interview. The problem is to predict the current contraceptive method choice (no use, long-term methods, or short-term methods) of a woman based on her demographic and socio-economic characteristics.
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		1473
+5: Features.		9
+6: Classes.			3	
+7: Missing values.	No
+
+8: Header.
+
+@relation contraceptive
+@attribute Wife_age integer[16,49]
+@attribute Wife_education integer[1,4]
+@attribute Husband_education integer[1,4]
+@attribute Children integer[0,16]
+@attribute Wife_religion integer[0,1]
+@attribute Wife_working integer[0,1]
+@attribute Husband_occupation integer[1,4]
+@attribute Standard-of-living integer[1,4]
+@attribute Media_exposure integer[0,1]
+@attribute Contraceptive_method {1,2,3}
+@inputs Wife_age, Wife_education, Husband_education, Children, Wife_religion, Wife_working, Husband_occupation, Standard-of-living, Media_exposure 
+@output Contraceptive_method

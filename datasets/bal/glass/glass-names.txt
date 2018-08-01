@@ -1,0 +1,28 @@
+Glass Identification data set
+
+1: Description.
+
+From USA Forensic Science Service; 6 types of glass which can be found in the crime scene, defined in terms of their oxide content (i.e. Na, Fe, K, etc). 
+
+2: Type.			Classification	
+3: Origin.			Real world
+4: Instances.		214
+5: Features.		9
+6: Classes.			7	
+7: Missing values.	No
+
+8: Header.
+
+@relation glass
+@attribute RI real [1.51115, 1.53393]
+@attribute Na real [10.73, 17.38]
+@attribute Mg real [0.0, 4.49]
+@attribute Al real [0.29, 3.5]
+@attribute Si real [69.81, 75.41]
+@attribute K real [0.0, 6.21]
+@attribute Ca real [5.43, 16.19]
+@attribute Ba real [0.0, 3.15]
+@attribute Fe real [0.0, 0.51]
+@attribute TypeGlass {1, 2, 3, 4, 5, 6, 7}
+@inputs RI, Na, Mg, Al, Si, K, Ca, Ba, Fe
+@outputs TypeGlass

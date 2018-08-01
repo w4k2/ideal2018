@@ -8,7 +8,50 @@ import helper as h
 from sklearn import metrics
 
 
-class FeatureSelectingEnsemble():
+class GeneticFeatureSelectionEnsemble():
+    """
+    GFSE.
+
+    Lorem ipsum dolor sit amet.
+    """
+
+    def __init__(self, base_clf, n_candidates=20, a=.5, b=.5):
+        """Init."""
+        self.base_clf = base_clf
+        self.n_candidates = n_candidates
+        self.a = a
+        self.b = b
+
+    def fit(self, X, y):
+        """Compute models."""
+        self.candidates = []
+        for i in range(self.n_candidates):
+            candidate = RandomFeatureEnsemble(self.base_clf, alpha=self.a,
+                                              beta=self.b)
+            candidate.fit(X, y)
+            self.candidates.append(candidate)
+
+        scores = np.array([c.quality(X, y) for c in self.candidates])
+        self.qualities = scores[:, 0]
+        self.bacs = scores[:, 1]
+
+        places = np.argsort(1-self.qualities)
+
+        # print(places)
+        # print(self.qualities)
+
+        self.qualities = self.qualities[places]
+        self.bacs = self.bacs[places]
+        self.candidates = [self.candidates[i] for i in places]
+
+        # print(self.qualities)
+
+    def bac(self, X, y):
+        """Balanced accuracy score."""
+        return self.candidates[0].bac(X, y)
+
+
+class RandomFeatureEnsemble():
     """
     Feature Selecting Ensemble.
 
@@ -42,6 +85,12 @@ class FeatureSelectingEnsemble():
                                                       size=(self.n_members,
                                                             self.d),
                                                       p=[1-self.p, self.p])
+
+        # Prevent for empty features set
+        for row in self.selected_features:
+            if np.sum(row) == 0:
+                row[np.random.randint(self.d)] = True
+
         # Establishing ensemble
         self.ensemble = []
         for features_mask in self.selected_features:
@@ -70,9 +119,10 @@ class FeatureSelectingEnsemble():
 
     def quality(self, X, y):
         """Optimization criteria."""
+        bac = self.bac(X, y)
         a = self.alpha * self.features_proportion()
         b = self.beta * self.average_hamming()
-        return self.bac(X, y) - a + b
+        return bac - a + b, bac
 
     def average_hamming(self):
         """Return average hamming measure between members of commitee."""
