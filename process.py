@@ -20,6 +20,8 @@ datasets = h.datasets_for_groups([
     "imb_IRhigherThan9p2"
 ])
 
+print('group,dataset,features,bare,one_random_ens,gfse,best_one')
+
 min_features = 8
 analyzed_datasets = 0
 for dataset in datasets:
@@ -40,6 +42,7 @@ for dataset in datasets:
     bas_bacs = []
     rfe_bacs = []
     gfs_bacs = []
+    bns_bacs = []
     for f in range(5):
         # Divide sets
         X_f_train, X_f_test = X_[f][0], X_[f][1]
@@ -64,20 +67,35 @@ for dataset in datasets:
         gfse = m.GeneticFeatureSelectionEnsemble(base_clf, a=.1, b=.1)
         gfse.fit(X_f_train, y_f_train)
         gbac = gfse.bac(X_f_test, y_f_test)
-        #print(gbac)
+        # print(gbac)
+
+        # Best single
+        bens = []
+        for i, clf in enumerate(gfse.candidates[0].ensemble):
+            prediction = clf.predict(
+                X_f_test[:,
+                         gfse.candidates[0].selected_features[i]]
+            )
+            a = metrics.balanced_accuracy_score(
+                y_f_test,
+                prediction
+            )
+            bens.append(a)
 
         bas_bacs.append(bare_bac)
         rfe_bacs.append(bac)
         gfs_bacs.append(gbac)
+        bns_bacs.append(np.mean(bens))
 
     bas_bac = np.mean(bas_bacs)
     rfe_bac = np.mean(rfe_bacs)
     gfs_bac = np.mean(gfs_bacs)
+    bns_bac = np.mean(bns_bacs)
 
-    print("%s,%s,%i,%.3f,%.3f,%.3f" % (
-        dataset[0], dataset[1], X.shape[1], bas_bac, rfe_bac, gfs_bac
+    print("%s,%s,%i,%.3f,%.3f,%.3f,%.3f" % (
+        dataset[0], dataset[1], X.shape[1], bas_bac, rfe_bac, gfs_bac,
+        bns_bac
     ))
     analyzed_datasets += 1
-    # break
 
-# print("%i analyzed datasets" % analyzed_datasets)
+print("%i analyzed datasets" % analyzed_datasets)
