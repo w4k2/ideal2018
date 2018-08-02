@@ -5,6 +5,7 @@ Multi-class imbalanced data classification based on feature selection
 techniques.
 """
 import numpy as np
+import os
 import method as m
 import helper as h
 from sklearn import naive_bayes
@@ -13,9 +14,6 @@ np.set_printoptions(precision=3)
 
 alphas = np.array([0, .1, .3, .5, .7, .9, 1])
 betas = np.array([0, .1, .3, .5, .7, .9, 1])
-
-alphas = np.array([0, .25, .5, .75, 1])
-betas = np.array([0, .25, .5, .75, 1])
 
 np.random.seed(2)
 
@@ -68,7 +66,8 @@ def process_instance(dataset, label_corrector, X_, y_, base_clf,
                 winner = fse.candidates[0]
                 bens = []
                 for i, clf in enumerate(winner.ensemble):
-                    prediction = clf.predict(X_f_test[:, winner.selected_features[i]])
+                    prediction = clf.predict(X_f_test[:,
+                                                      winner.selected_features[i]])
                     bens.append(bas(y_f_test, prediction))
                 one_bacs_0[a, b, f] = np.max(bens)
 
@@ -116,34 +115,16 @@ for dataset in h.datasets():
     # Process instances of problem
     label_corrector = np.max(y) - 1
 
-    res = process_instance(
-        dataset, label_corrector=label_corrector,
-        X_=X_, y_=y_, base_clf=base_clf, p=.5,
-        n_candidates=20, n_members=5
-    )
+    if os.path.exists('results/%s.npy' % dataset):
+        res = np.load('results/%s.npy' % dataset)
+    else:
+        res = process_instance(
+            dataset, label_corrector=label_corrector,
+            X_=X_, y_=y_, base_clf=base_clf, p=.5,
+            n_candidates=20, n_members=5
+        )
+        np.save('results/%s' % dataset, res)
 
-    sumtable_scores = np.zeros((len(alphas), len(betas)))
-    sumtable_winners = np.zeros((len(alphas), len(betas))).astype(int)
-
-    for a, alpha in enumerate(alphas):
-        row_scores = []
-        row_winners = []
-        for b, beta in enumerate(betas):
-            local_res = res[a, b, 1:, :]
-            mean_scores = np.mean(local_res, axis=1)
-            bare_score = np.mean(res[a, b, 0, :])
-            winner = np.argmax(mean_scores)
-            score = np.max(mean_scores)
-
-            sumtable_scores[a, b] = score
-            sumtable_winners[a, b] = winner
-
-    h.plot(dataset, alphas, betas, sumtable_scores, sumtable_winners,
-           bare_score)
-
-    for i, var in enumerate(h.variations):
-        loc_sco = np.mean(res[:, :, i+1, :], axis=2)
-        h.plot("%s_%s" % (dataset, var), alphas, betas,
-               loc_sco, None, bare_score)
+    h.analyze(dataset, res, alphas, betas)
 
     analyzed_datasets += 1

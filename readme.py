@@ -16,9 +16,6 @@ print("> %s\n" % abstract)
 for dataset in h.datasets():
     print("## %s\n" % dataset)
 
-    print("#### Summary\n")
+    print("![](plots/%s_bar.png)\n" % dataset)
     print("![](plots/%s.png)\n" % dataset)
-
-    for i, var in enumerate(h.variations):
-        print("#### %s\n" % var)
-        print("![](plots/%s_%s.png)\n" % (dataset, var))
+    print("![](plots/%s_sum.png)\n" % dataset)

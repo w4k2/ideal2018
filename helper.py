@@ -3,49 +3,117 @@ import numpy as np
 import os
 import itertools
 import matplotlib.pyplot as plt
+from scipy import stats
 ds_dir = "datasets"
-variations = ("e_r", "e_w", "e_n", "s_r", "s_w", "s_n")
+variations = ("bare", "e_r", "e_w", "e_n", "s_r", "s_w", "s_n")
 
 
-def plot(dataset, alphas, betas, sumtable_scores, sumtable_winners, bs):
+def analyze(dataset, res, alphas, betas):
     """Plot whole search result."""
-    cmap = plt.cm.Blues
+    # Prepare views for plot
+    sumtable_scores = np.zeros((len(alphas), len(betas)))
+    sumtable_winners = np.zeros((len(alphas), len(betas))).astype(int)
+    bare_score = np.mean(res[0, 0, 0, :])
+
+    # Search for results for parameter
+    for a, alpha in enumerate(alphas):
+        for b, beta in enumerate(betas):
+            local_res = res[a, b, 1:, :]
+            mean_scores = np.mean(local_res, axis=1)
+            winner = np.argmax(mean_scores) + 1
+            score = np.max(mean_scores)
+
+            sumtable_scores[a, b] = score
+            sumtable_winners[a, b] = winner
+
+    # Establish best combination
+    gs_winner = np.unravel_index(np.argmax(sumtable_scores,
+                                           axis=None),
+                                 sumtable_scores.shape)
+    leader = sumtable_winners[gs_winner]
+    optimal_scores = res[gs_winner[0], gs_winner[1], :, :]
+    print("Overall winner %s [%s]" % (str(gs_winner), variations[leader]))
+
+    optimal_mean = np.mean(optimal_scores, axis=1)
+    optimal_std = np.std(optimal_scores, axis=1)
+    print(optimal_mean)
+    print(optimal_std)
+
+    # Analyze dependencies
+    optimal_dependencies = []
+    a = optimal_scores[leader]
+    for i, var in enumerate(variations):
+        if i == leader:
+            optimal_dependencies.append(True)
+        else:
+            b = optimal_scores[i]
+            if optimal_mean[i] == optimal_mean[leader]:
+                is_dependent = True
+            else:
+                is_dependent = stats.wilcoxon(a, b).pvalue > 0.05
+            optimal_dependencies.append(is_dependent)
+    optimal_dependencies = np.array(optimal_dependencies)
+
+    # Plot barchart
+    plt.figure(figsize=(6, 3))
+    # fig, ax = plt.subplots()
+    plt.title(dataset)
+    dep_color = ["green" if d else "red" for d in optimal_dependencies]
+    plt.bar(list(variations), optimal_mean, color=dep_color,
+            yerr=optimal_std, alpha=.75)
+
+    plt.tight_layout()
+    plt.savefig("plots/%s_bar.png" % dataset)
+    plt.clf()
+
+    # Prepare plot helpers
     cmap = plt.cm.coolwarm
     maxs = np.max(sumtable_scores)
-    diff = np.abs(maxs - bs)
+    diff = np.abs(maxs - bare_score)
+    vmin = bare_score - diff
+    vmax = bare_score + diff
 
-    plt.imshow(sumtable_scores, interpolation='nearest',
-               cmap=cmap, vmin=bs - diff, vmax=bs + diff)
-    plt.title("%s (bare %.3f)" % (dataset, bs))
+    # Plot summary of GS
+    plt.figure(figsize=(6, 5))
+    plt.imshow(sumtable_scores, interpolation='nearest', cmap=cmap,
+               vmin=vmin, vmax=vmax)
+    plt.title("%s (bare %.3f)" % (dataset, bare_score))
     plt.colorbar()
 
     plt.yticks(np.arange(len(alphas)),
-               alphas, rotation=45)
+               alphas, rotation=0)
     plt.xticks(np.arange(len(betas)),
-               betas, rotation=45)
-
-    tresh = .5
-    if sumtable_winners is not None:
-        for i, j in itertools.product(range(len(alphas)),
-                                      range(len(betas))):
-            plt.text(j, i, "%s\n%.3f" % (variations[sumtable_winners[i, j]],
-                                         sumtable_scores[i, j]),
-                     horizontalalignment="center",
-                     verticalalignment="center",
-                     color="white" if sumtable_scores[i, j] > tresh else "black")
-    else:
-        for i, j in itertools.product(range(len(alphas)),
-                                      range(len(betas))):
-            plt.text(j, i, "%.3f" % (sumtable_scores[i, j]),
-                     horizontalalignment="center",
-                     verticalalignment="center",
-                     color="white" if sumtable_scores[i, j] > tresh else "black")
-
-    plt.tight_layout()
+               betas, rotation=0)
     plt.ylabel('alpha')
     plt.xlabel('beta')
 
+    for i, j in itertools.product(range(len(alphas)),
+                                  range(len(betas))):
+        plt.text(j, i, "%s\n%.3f" % (variations[sumtable_winners[i, j]],
+                                     sumtable_scores[i, j]),
+                 horizontalalignment="center",
+                 verticalalignment="center",
+                 color="white")
+
+    plt.tight_layout()
     plt.savefig("plots/%s.png" % dataset)
+    plt.clf()
+
+    # Plot barchart
+    fig, ax = plt.subplots(2, 3, figsize=(6, 4))
+
+    for i in range(1, 7):
+        loc_sco = np.mean(res[:, :, i, :], axis=2)
+        a, b = (i-1) // 3, (i-1) % 3
+
+        ax[a, b].imshow(loc_sco, cmap=cmap,
+                        vmin=vmin, vmax=vmax)
+        ax[a, b].set_title(variations[i])
+        ax[a, b].set_xticks([])
+        ax[a, b].set_yticks([])
+
+    plt.tight_layout()
+    plt.savefig("plots/%s_sum.png" % dataset)
     plt.clf()
 
 
