@@ -12,13 +12,15 @@ def analyze(dataset, X, y, res, alphas, betas):
     """Plot whole search result."""
     # Analyze dataset
     row = []
-    row.append(dataset)
+    row.append(dataset.replace('_', '').replace('-',''))
 
     # IR
-    first = np.sum(y == 0)
-    second = np.sum(y == 1)
+    u = np.unique(y)
+    first = np.sum(y == u[0])
+    second = np.sum(y == u[1])
+    print(first, second)
     ir = first/second if first>second else second/first
-    row.append("%.2f" % ir)
+    row.append("%.0f" % ir)
 
     # Samples and features
     row.append("%i" % X.shape[0])
@@ -45,8 +47,8 @@ def analyze(dataset, X, y, res, alphas, betas):
                                            axis=None),
                                  sumtable_scores.shape)
 
-    row.append("%.1f" % alphas[gs_winner[0]])
-    row.append("%.1f" % betas[gs_winner[1]])
+    row.append(("%.1f" % alphas[gs_winner[0]])[1:])
+    row.append(("%.1f" % betas[gs_winner[1]])[1:])
 
     leader = sumtable_winners[gs_winner]
     optimal_scores = res[gs_winner[0], gs_winner[1], :, :]
@@ -56,6 +58,11 @@ def analyze(dataset, X, y, res, alphas, betas):
     optimal_std = np.std(optimal_scores, axis=1)
     print(optimal_mean)
     print(optimal_std)
+
+    print(leader)
+    if optimal_mean[leader] < optimal_mean[0]:
+        leader = 0
+
 
     # Analyze dependencies
     optimal_dependencies = []
