@@ -8,8 +8,22 @@ ds_dir = "datasets"
 variations = ("bare", "e_r", "e_w", "e_n", "s_r", "s_w", "s_n")
 
 
-def analyze(dataset, res, alphas, betas):
+def analyze(dataset, X, y, res, alphas, betas):
     """Plot whole search result."""
+    # Analyze dataset
+    row = []
+    row.append(dataset)
+
+    # IR
+    first = np.sum(y == 0)
+    second = np.sum(y == 1)
+    ir = first/second if first>second else second/first
+    row.append("%.2f" % ir)
+
+    # Samples and features
+    row.append("%i" % X.shape[0])
+    row.append("%i" % X.shape[1])
+
     # Prepare views for plot
     sumtable_scores = np.zeros((len(alphas), len(betas)))
     sumtable_winners = np.zeros((len(alphas), len(betas))).astype(int)
@@ -30,6 +44,10 @@ def analyze(dataset, res, alphas, betas):
     gs_winner = np.unravel_index(np.argmax(sumtable_scores,
                                            axis=None),
                                  sumtable_scores.shape)
+
+    row.append("%.1f" % alphas[gs_winner[0]])
+    row.append("%.1f" % betas[gs_winner[1]])
+
     leader = sumtable_winners[gs_winner]
     optimal_scores = res[gs_winner[0], gs_winner[1], :, :]
     print("Overall winner %s [%s]" % (str(gs_winner), variations[leader]))
@@ -53,6 +71,10 @@ def analyze(dataset, res, alphas, betas):
                 is_dependent = stats.wilcoxon(a, b).pvalue > 0.05
             optimal_dependencies.append(is_dependent)
     optimal_dependencies = np.array(optimal_dependencies)
+
+    for i, od in enumerate(optimal_dependencies):
+        row.append("\\cellcolor{%s!25} %.3f" % ("green" if od else "red", optimal_mean[i]))
+        row.append("%.3f" % optimal_std[i])
 
     # Plot barchart
     plt.figure(figsize=(6, 3))
@@ -115,6 +137,8 @@ def analyze(dataset, res, alphas, betas):
     plt.tight_layout()
     plt.savefig("plots/%s_sum.png" % dataset)
     plt.clf()
+
+    return row
 
 
 def hamming(a, b):

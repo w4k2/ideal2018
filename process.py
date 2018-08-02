@@ -6,6 +6,7 @@ techniques.
 """
 import numpy as np
 import os
+import csv
 import method as m
 import helper as h
 from sklearn import naive_bayes
@@ -101,6 +102,14 @@ def process_instance(dataset, label_corrector, X_, y_, base_clf,
 
     return results
 
+csvfile = open('results/results.csv', 'w')
+csvwriter = csv.writer(csvfile)
+headers = ["dataset", 'ir', 'samples', 'features', 'alpha', 'beta',
+           'bare', 'barestd', 'er', 'erstd', 'ew', 'ewstd', 'en',
+           'enstd', 'sr', 'srstd', 'sw', 'swstd', 'sn', 'snstd']
+
+csvwriter.writerow(headers)
+
 
 min_features = 8
 analyzed_datasets = 0
@@ -125,6 +134,8 @@ for dataset in h.datasets():
         )
         np.save('results/%s' % dataset, res)
 
-    h.analyze(dataset, res, alphas, betas)
+    analysis = h.analyze(dataset, X, y, res, alphas, betas)
+    print(analysis)
 
+    csvwriter.writerow(analysis)
     analyzed_datasets += 1
