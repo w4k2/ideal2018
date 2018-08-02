@@ -100,17 +100,17 @@ def analyze(dataset, res, alphas, betas):
     plt.clf()
 
     # Plot barchart
-    fig, ax = plt.subplots(2, 3, figsize=(6, 4))
+    fig, ax = plt.subplots(1, 6, figsize=(6, 1.5))
 
     for i in range(1, 7):
         loc_sco = np.mean(res[:, :, i, :], axis=2)
-        a, b = (i-1) // 3, (i-1) % 3
+        # a, b = (i-1) // 3, (i-1) % 3
 
-        ax[a, b].imshow(loc_sco, cmap=cmap,
-                        vmin=vmin, vmax=vmax)
-        ax[a, b].set_title(variations[i])
-        ax[a, b].set_xticks([])
-        ax[a, b].set_yticks([])
+        ax[i-1].imshow(loc_sco, cmap=cmap,
+                       vmin=vmin, vmax=vmax)
+        ax[i-1].set_title(variations[i])
+        ax[i-1].set_xticks([])
+        ax[i-1].set_yticks([])
 
     plt.tight_layout()
     plt.savefig("plots/%s_sum.png" % dataset)
