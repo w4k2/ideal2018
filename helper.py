@@ -80,8 +80,12 @@ def analyze(dataset, X, y, res, alphas, betas):
     optimal_dependencies = np.array(optimal_dependencies)
 
     for i, od in enumerate(optimal_dependencies):
-        row.append("\\cellcolor{%s!25} %.3f" % ("green" if od else "white", optimal_mean[i]))
-        row.append("%.3f" % optimal_std[i])
+        if optimal_mean[i] == optimal_mean[leader]:
+            row.append("\\cellcolor{green!20} \\underline{%.3f}" % ( optimal_mean[i]))
+            row.append("%.3f" % optimal_std[i])
+        else:
+            row.append("\\cellcolor{%s!20} %.3f" % ("green" if od else "white", optimal_mean[i]))
+            row.append("%.3f" % optimal_std[i])
 
     # Plot barchart
     plt.figure(figsize=(6, 3))
@@ -104,18 +108,18 @@ def analyze(dataset, X, y, res, alphas, betas):
     vmax = bare_score + diff
 
     # Plot summary of GS
-    plt.figure(figsize=(6, 5))
+    plt.figure(figsize=(5, 6))
     plt.imshow(sumtable_scores, interpolation='nearest', cmap=cmap,
                vmin=vmin, vmax=vmax)
-    plt.title("%s (bare %.3f)" % (dataset, bare_score),fontsize=20)
-    plt.colorbar()
+    plt.title("%s (bare %.3f)" % (dataset, bare_score),fontsize=16)
+    plt.colorbar(orientation='horizontal',shrink=.86)
 
     plt.yticks(np.arange(len(alphas)),
-               alphas, rotation=0,fontsize=12)
+               alphas, rotation=0,fontsize=11)
     plt.xticks(np.arange(len(betas)),
-               betas, rotation=0,fontsize=12)
-    plt.ylabel('alpha', fontsize=12)
-    plt.xlabel('beta',fontsize=12)
+               betas, rotation=0,fontsize=11)
+    plt.ylabel('alpha', fontsize=11)
+    plt.xlabel('beta',fontsize=11)
 
     for i, j in itertools.product(range(len(alphas)),
                                   range(len(betas))):
@@ -131,7 +135,7 @@ def analyze(dataset, X, y, res, alphas, betas):
     plt.savefig("plots/%s.eps" % dataset)
     plt.clf()
 
-    # Plot barchart
+    # Plot summary
     fig, ax = plt.subplots(2, 3, figsize=(6, 4))
 
     for i in range(1, 7):
@@ -140,7 +144,7 @@ def analyze(dataset, X, y, res, alphas, betas):
 
         ax[a, b].imshow(loc_sco, cmap=cmap,
                        vmin=vmin, vmax=vmax)
-        ax[a, b].set_title(variations[i],fontsize=16)
+        ax[a, b].set_title(variations[i],fontsize=22)
         ax[a, b].set_xticks([])
         ax[a, b].set_yticks([])
 

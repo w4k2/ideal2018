@@ -146,14 +146,6 @@
 
 ![](plots/pima_sum.png)
 
-## ring
-
-![](plots/ring_bar.png)
-
-![](plots/ring.png)
-
-![](plots/ring_sum.png)
-
 ## shuttle-c0-vs-c4
 
 ![](plots/shuttle-c0-vs-c4_bar.png)
