@@ -80,7 +80,7 @@ def analyze(dataset, X, y, res, alphas, betas):
     optimal_dependencies = np.array(optimal_dependencies)
 
     for i, od in enumerate(optimal_dependencies):
-        row.append("\\cellcolor{%s!25} %.3f" % ("green" if od else "red", optimal_mean[i]))
+        row.append("\\cellcolor{%s!25} %.3f" % ("green" if od else "white", optimal_mean[i]))
         row.append("%.3f" % optimal_std[i])
 
     # Plot barchart
@@ -93,6 +93,7 @@ def analyze(dataset, X, y, res, alphas, betas):
 
     plt.tight_layout()
     plt.savefig("plots/%s_bar.png" % dataset)
+    plt.savefig("plots/%s_bar.eps" % dataset)
     plt.clf()
 
     # Prepare plot helpers
@@ -126,23 +127,25 @@ def analyze(dataset, X, y, res, alphas, betas):
 
     plt.tight_layout()
     plt.savefig("plots/%s.png" % dataset)
+    plt.savefig("plots/%s.eps" % dataset)
     plt.clf()
 
     # Plot barchart
-    fig, ax = plt.subplots(1, 6, figsize=(6, 1.5))
+    fig, ax = plt.subplots(2, 3, figsize=(6, 3))
 
     for i in range(1, 7):
         loc_sco = np.mean(res[:, :, i, :], axis=2)
-        # a, b = (i-1) // 3, (i-1) % 3
+        a, b = (i-1) // 3, (i-1) % 3
 
-        ax[i-1].imshow(loc_sco, cmap=cmap,
+        ax[a, b].imshow(loc_sco, cmap=cmap,
                        vmin=vmin, vmax=vmax)
-        ax[i-1].set_title(variations[i])
-        ax[i-1].set_xticks([])
-        ax[i-1].set_yticks([])
+        ax[a, b].set_title(variations[i])
+        ax[a, b].set_xticks([])
+        ax[a, b].set_yticks([])
 
     plt.tight_layout()
     plt.savefig("plots/%s_sum.png" % dataset)
+    plt.savefig("plots/%s_sum.eps" % dataset)
     plt.clf()
 
     return row
