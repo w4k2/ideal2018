@@ -107,15 +107,15 @@ def analyze(dataset, X, y, res, alphas, betas):
     plt.figure(figsize=(6, 5))
     plt.imshow(sumtable_scores, interpolation='nearest', cmap=cmap,
                vmin=vmin, vmax=vmax)
-    plt.title("%s (bare %.3f)" % (dataset, bare_score))
+    plt.title("%s (bare %.3f)" % (dataset, bare_score),fontsize=20)
     plt.colorbar()
 
     plt.yticks(np.arange(len(alphas)),
-               alphas, rotation=0)
+               alphas, rotation=0,fontsize=12)
     plt.xticks(np.arange(len(betas)),
-               betas, rotation=0)
-    plt.ylabel('alpha')
-    plt.xlabel('beta')
+               betas, rotation=0,fontsize=12)
+    plt.ylabel('alpha', fontsize=12)
+    plt.xlabel('beta',fontsize=12)
 
     for i, j in itertools.product(range(len(alphas)),
                                   range(len(betas))):
@@ -123,7 +123,8 @@ def analyze(dataset, X, y, res, alphas, betas):
                                      sumtable_scores[i, j]),
                  horizontalalignment="center",
                  verticalalignment="center",
-                 color="white")
+                 color="white",
+                 fontsize=12)
 
     plt.tight_layout()
     plt.savefig("plots/%s.png" % dataset)
@@ -131,7 +132,7 @@ def analyze(dataset, X, y, res, alphas, betas):
     plt.clf()
 
     # Plot barchart
-    fig, ax = plt.subplots(2, 3, figsize=(6, 3))
+    fig, ax = plt.subplots(2, 3, figsize=(6, 4))
 
     for i in range(1, 7):
         loc_sco = np.mean(res[:, :, i, :], axis=2)
@@ -139,7 +140,7 @@ def analyze(dataset, X, y, res, alphas, betas):
 
         ax[a, b].imshow(loc_sco, cmap=cmap,
                        vmin=vmin, vmax=vmax)
-        ax[a, b].set_title(variations[i])
+        ax[a, b].set_title(variations[i],fontsize=16)
         ax[a, b].set_xticks([])
         ax[a, b].set_yticks([])
 
